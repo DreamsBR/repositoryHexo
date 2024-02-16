@@ -85,7 +85,7 @@ public class PersonaAdapter implements PersonaServiceOut {
         ResponseReniec responseReniec = reniec.getInfoReniec(numero,authorization);
         return  responseReniec;
     }
-    private PersonaEntity getEntity(ResponseReniec reniec, RequestPersona requestPersona){
+        private PersonaEntity getEntity(ResponseReniec reniec, RequestPersona requestPersona){
         TipoDocumentoEntity tipoDocumento = tipoDocumentoRepository.findByCodTipo(requestPersona.getTipoDoc());
         PersonaEntity entity = new PersonaEntity();
         entity.setNumDocu(reniec.getNumeroDocumento());
