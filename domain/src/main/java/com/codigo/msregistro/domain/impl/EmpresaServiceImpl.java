@@ -37,4 +37,9 @@ public class EmpresaServiceImpl implements EmpresaServiceIn {
     public EmpresaDTO updateEmpresa(Long id, RequestEmpresa empresa) {
         return empresaServiceOut.updateEmpresa(id, empresa);
     }
+
+    @Override
+    public Optional<EmpresaDTO> obtenerPersonaOut(Long id) {
+        return empresaServiceOut.obtenerPersonaOut(id);
+    }
 }
