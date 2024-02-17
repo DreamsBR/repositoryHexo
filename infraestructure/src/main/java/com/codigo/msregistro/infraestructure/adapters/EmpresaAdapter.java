@@ -3,11 +3,14 @@ package com.codigo.msregistro.infraestructure.adapters;
 
 import com.codigo.msregistro.domain.aggregates.constants.Constants;
 import com.codigo.msregistro.domain.aggregates.dto.EmpresaDTO;
+import com.codigo.msregistro.domain.aggregates.dto.PersonaDTO;
 import com.codigo.msregistro.domain.aggregates.request.RequestEmpresa;
 import com.codigo.msregistro.domain.aggregates.request.RequestPersona;
 import com.codigo.msregistro.domain.aggregates.response.ResponseReniec;
 import com.codigo.msregistro.domain.aggregates.response.ResponseSunat;
+import com.codigo.msregistro.domain.ports.out.EmpresaServiceOut;
 import com.codigo.msregistro.infraestructure.entity.EmpresaEntity;
+import com.codigo.msregistro.infraestructure.entity.PersonaEntity;
 import com.codigo.msregistro.infraestructure.entity.TipoDocumentoEntity;
 import com.codigo.msregistro.infraestructure.mapper.EmpresaMapper;
 import com.codigo.msregistro.infraestructure.repository.EmpresaRepository;
@@ -17,9 +20,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
 @RequiredArgsConstructor
 @Service
-public class EmpresaAdapter {
+public class EmpresaAdapter implements EmpresaServiceOut {
 
     private final EmpresaRepository empresaRepository;
 
@@ -32,14 +40,66 @@ public class EmpresaAdapter {
     @Value("${token.api}")
     private String authToken;
 
-    public EmpresaDTO createEmpresa(RequestEmpresa requesEmpresa) {
+    @Override
+    public EmpresaDTO save(RequestEmpresa empresa) {
+        ResponseSunat datosReniec = getExecutionSunat(empresa.getNumDoc());
+        empresaRepository.save(getEntity(datosReniec, empresa));
+        return empresaMapper.mapToDTO(getEntity(datosReniec, empresa));    }
+
+    @Override
+    public List<EmpresaDTO> getAll() {
+        List<EmpresaDTO> personaDTOList = new ArrayList<>();
+        List<EmpresaEntity> entities = empresaRepository.findAll();
+        for(EmpresaEntity empresas : entities){
+            EmpresaDTO empresaDto = empresaMapper.mapToDTO(empresas);
+            personaDTOList.add(empresaDto);
+        }
+        return personaDTOList;
+    }
+
+    @Override
+    public EmpresaDTO deleteById(Long id) {
+        boolean existe = empresaRepository.existsById(id);
+
+        if(existe){
+            Optional<EmpresaEntity> entity = empresaRepository.findById(id);
+            entity.get().setEstadoBol(0);
+            entity.get().setUsuaDelet(Constants.AUDIT_ADMIN);
+            entity.get().setDateDelet(getTimestamp());
+            empresaRepository.save(entity.get());
+            return empresaMapper.mapToDTO(entity.get());
+        }
         return null;
+    }
+
+
+    @Override
+    public EmpresaDTO updateEmpresa(Long id, RequestEmpresa requestEmpresa) {
+        boolean existe = empresaRepository.existsById(id);
+        if(existe){
+            Optional<EmpresaEntity> entity = empresaRepository.findById(id);
+            ResponseSunat response = getExecutionSunat(requestEmpresa.getNumDoc());
+            empresaRepository.save(getEntityUpdate(response,entity.get()));
+            return empresaMapper.mapToDTO(getEntityUpdate(response,entity.get()));
+        }
+        return null;
+    }
+
+    @Override
+    public Optional<EmpresaDTO> obtenerPersonaOut(Long id) {
+        return Optional.ofNullable(empresaMapper.mapToDTO(empresaRepository.findById(id).get()));
+    }
+
+    private Timestamp getTimestamp(){
+        long currentTime = System.currentTimeMillis();
+        Timestamp timestamp = new Timestamp(currentTime);
+        return timestamp;
     }
 
 
     /*Helpers*/
 
-    public ResponseSunat getInfoSunat(String numero){
+    public ResponseSunat getExecutionSunat(String numero){
         String auth = "Bearer " + authToken;
         ResponseSunat sunatResponse =  clienteSunat.getInfoSunat(numero, auth);
         return sunatResponse;
@@ -79,7 +139,7 @@ public class EmpresaAdapter {
         empresaActualizar.setIdEmpres(sunat.getIdEmpres());
         empresaActualizar.setNumRuc(sunat.getNumRuc());
         empresaActualizar.setRazonSocial(sunat.getRazonSocial());
-        empresaActualizar.setTipoDocumento(sunat.getTipoDocumento());
+        //empresaActualizar.setTipoDocumento(sunat.getTipoDocumento());
         empresaActualizar.setNumeroDocumento(sunat.getNumeroDocumento());
         empresaActualizar.setEstado(sunat.getEstado());
         empresaActualizar.setCondicion(sunat.getCondicion());
@@ -103,7 +163,6 @@ public class EmpresaAdapter {
         return empresaActualizar;
 
     }
-
 
 
 }

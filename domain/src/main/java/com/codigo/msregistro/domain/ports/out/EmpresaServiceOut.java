@@ -1,20 +1,21 @@
 package com.codigo.msregistro.domain.ports.out;
 
 import com.codigo.msregistro.domain.aggregates.dto.EmpresaDTO;
+import com.codigo.msregistro.domain.aggregates.request.RequestEmpresa;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface EmpresaServiceOut {
 
-    EmpresaDTO save (EmpresaDTO empresaDTO);
+    EmpresaDTO save (RequestEmpresa empresa);
 
     List<EmpresaDTO> getAll();
 
-    Optional<EmpresaDTO> findById (Long id);
+    EmpresaDTO deleteById (Long id);
 
-    void deleteById (Long id);
+    EmpresaDTO updateEmpresa (Long id, RequestEmpresa empresa);
 
-    EmpresaDTO updateEmpresa (Long id, EmpresaDTO empresaDTO);
+    Optional<EmpresaDTO > obtenerPersonaOut (Long id);
 
 }

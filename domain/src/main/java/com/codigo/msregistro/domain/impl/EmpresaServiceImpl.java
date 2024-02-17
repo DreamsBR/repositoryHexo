@@ -1,21 +1,25 @@
 package com.codigo.msregistro.domain.impl;
 
+import com.codigo.msregistro.domain.aggregates.constants.Constants;
 import com.codigo.msregistro.domain.aggregates.dto.EmpresaDTO;
+import com.codigo.msregistro.domain.aggregates.request.RequestEmpresa;
 import com.codigo.msregistro.domain.ports.in.EmpresaServiceIn;
 import com.codigo.msregistro.domain.ports.out.EmpresaServiceOut;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
+@Service
 @RequiredArgsConstructor
 public class EmpresaServiceImpl implements EmpresaServiceIn {
 
     private final EmpresaServiceOut empresaServiceOut;
 
     @Override
-    public EmpresaDTO saveEmpresa(EmpresaDTO empresaDTO) {
-        return empresaServiceOut.save(empresaDTO);
+    public EmpresaDTO saveEmpresa(RequestEmpresa empresa) {
+        return empresaServiceOut.save(empresa);
     }
 
     @Override
@@ -24,17 +28,13 @@ public class EmpresaServiceImpl implements EmpresaServiceIn {
     }
 
     @Override
-    public Optional<EmpresaDTO> findById(Long id) {
-        return empresaServiceOut.findById(id);
+    public EmpresaDTO deleteById(Long id) {
+        return empresaServiceOut.deleteById(id);
     }
 
-    @Override
-    public void deleteById(Long id) {
-        empresaServiceOut.deleteById(id);
-    }
 
     @Override
-    public EmpresaDTO updateEmpresa(Long id, EmpresaDTO empresaDTO) {
-        return empresaServiceOut.updateEmpresa(id, empresaDTO);
+    public EmpresaDTO updateEmpresa(Long id, RequestEmpresa empresa) {
+        return empresaServiceOut.updateEmpresa(id, empresa);
     }
 }

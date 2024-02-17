@@ -19,6 +19,7 @@ public class EmpresaEntity {
     private Long idEmpres;
     private String numRuc;
     private String razonSocial;
+//    private String tipoDocumento;
     private String numeroDocumento;
     private String estado;
     private String condicion;
@@ -41,6 +42,7 @@ public class EmpresaEntity {
     private String esAgenteRetencion;
 
     /*Local Info*/
+    private Integer estadoBol;
     private String usuaCrea;
     @CreationTimestamp
     private Timestamp dateCreate;
